@@ -1,50 +1,33 @@
 ﻿#include "ShizukuEngine/ShizukuEngine.h"
+#include "Game/GameScene.h"
+#include "Game/TitleScene.h"
 #include <Windows.h>
-#include <psapi.h>
-#include <array>
-#include <random>
-#include <vector>
-#include <imgui.h>
-
-#pragma comment(lib, "psapi.lib")
+#include <memory>
 
 const int32_t kClineWidth = 1280;
 const int32_t kClineHeight = 720;
 
-// このプロセスが使っているメモリ量(MB)を取得する
-float GetProcessMemoryMB() {
-	PROCESS_MEMORY_COUNTERS_EX counters{};
-	BOOL isSucceeded = GetProcessMemoryInfo(
-		GetCurrentProcess(),
-		reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&counters),
-		sizeof(counters)
-	);
-	if (!isSucceeded) { return 0.0f; }
-	return static_cast<float>(counters.PrivateUsage) / (1024.0f * 1024.0f);
-}
+GameScene* gameScene = nullptr;
+TitleScene* title = nullptr;
+//GameClear* clear_ = nullptr;
+//GameOver* gameOver_ = nullptr;
+
+
+void ChangeScene();
+void UpdateScene();
+void DrawScene();
+
+enum class Scene { kUnknown = 0, kTitle, kGame, kGameClear, kGameOver };
+
+Scene scene = Scene::kTitle;
+ShizukuEngine* engine = nullptr;
+
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
-	ShizukuEngine* engine = new ShizukuEngine(kClineWidth, kClineHeight, L"みんだ");
-
-	//---------- 読み込み ----------
-	int tex = engine->LoadTexture("resources/uvChecker.png");
-	int model = engine->LoadModel("resources/fbx/Dragon 2.5_fbx.fbx");//失敗したら-1（DrawModelは何もしない）
-	int skinnedModel = engine->LoadSkinnedModel("resources/new/Samba Dancing.dae");
-	int anime=engine->LoadAnimation("resources/new/Samba Dancing.dae", skinnedModel);
-
-	int skinnedModel2 = engine->LoadSkinnedModel("resources/new/Freehang Climb.dae");
-	int anime2=engine->LoadAnimation("resources/new/Freehang Climb.dae", skinnedModel2);
-	
-	assert(skinnedModel != -1 && "スキンモデルの読み込みに失敗");
-	int terrain = engine->LoadModel("resources/terrain/terrain.obj");
-	int particle = engine->LoadModel("resources/plane.gltf");
-	int skyDome = engine->LoadModel("resources/skyDome/skyDome.fbx");
-
-	Vector3 pos{ 0,0,0 };
-
-	//モデルを回して立体感を確認する用
-	float modelRotateY = 0.0f;
+	engine = new ShizukuEngine(kClineWidth, kClineHeight, L"ShizukuEngine");
+	title = new TitleScene();
+	title->Initialize(engine);
 
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
@@ -56,62 +39,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			engine->Update();
 
-			modelRotateY += 0.0f;
+			ChangeScene();
+			UpdateScene();
+
 
 			engine->PreDraw();
 
-			//---------- モデル ----------
-			engine->DrawModel(
-				skyDome,
-				{ 0.0f, 0.0f, 0.0f },
-				{ 0.0f, modelRotateY, 0.0f },
-				{ 1.0f, 1.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f }
-			);
-
-			//engine->DrawModel(
-			//	particle,
-			//	{ 0.0f, 0.0f, 0.0f },
-			//	{ 0.0f, modelRotateY, 0.0f },
-			//	{ 1.0f, 1.0f, 1.0f },
-			//	{ 1.0f, 1.0f, 1.0f, 1.0f }
-			//);
-
-
-			engine->DrawModel(
-				terrain,
-				{ 0.0f, -2.0f, 0.0f },
-				{ 0.0f, modelRotateY, 0.0f },
-				{ 2.0f, 2.0f, 2.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f }
-			);
-
-			engine->DrawSkinnedModel(
-				skinnedModel,
-				anime,
-				{ 0.0f, -2.0f, 0.0f },
-				{ 0.0f, modelRotateY, 0.0f },
-				{ 1.0f, 1.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f }
-			);
-
-			engine->DrawSkinnedModel(
-				skinnedModel2,
-				anime2,
-				{ 3.0f, -2.0f, 0.0f },
-				{ 0.0f, modelRotateY, 0.0f },
-				{ 1.0f, 1.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f }
-			);
-
-
-			//---------- 今までの図形（モデルと重ならないよう横にずらす） ----------
-			for (int i = 0; i < 10; i++) {
-				engine->DrawTriangle({ pos.x - 3.0f + 0.1f * i, pos.y + 0.1f * i, pos.z - 1.5f * i }, { 0,0,0 }, { 1,1,1 }, { 1,1,1,1 }, tex);
-				engine->DrawSphere({ pos.x + 6.0f + 0.1f * i, pos.y + 0.1f * i, pos.z + 2.0f * i }, { 1,1,1 }, { 1,1,1 }, { 1,1,1,1 }, tex);
-			}
-
-			//engine->DrawSprite({ 100.0f, 100.0f }, 0.0f, 256.0f, 256.0f, { 1,1,1,1 }, tex);
+			DrawScene();
 
 			engine->PostDraw();
 
@@ -125,3 +59,94 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	return 0;
 }
+
+
+
+void ChangeScene() {
+
+	switch (scene) {
+	case Scene::kTitle:
+		if (title->IsFinished()) {
+			scene = Scene::kGame;
+			delete title;
+			title = nullptr;
+
+			gameScene = new GameScene;
+			gameScene->Initialize(engine);
+		}
+		break;
+	case Scene::kGame:
+
+		if (gameScene->IsFinished()) {
+			scene = Scene::kTitle;
+			delete gameScene;
+			gameScene = nullptr;
+
+			title = new TitleScene;
+			title->Initialize(engine);
+		}
+
+		break;
+
+	default:
+		break;
+	}
+}
+
+
+#pragma region ゲームの更新処理
+void UpdateScene() {
+	switch (scene) {
+	case Scene::kTitle: // タイトル
+		// LoadDebugSettings();
+
+		title->Update(1.0f / 60.0f);
+		break;
+	case Scene::kGame: // ゲーム中
+		// LoadDebugSettings();
+
+		gameScene->Update(1.0f / 60.0f);
+		break;
+		//case Scene::kGameClear: // ゲームクリア
+		//	clear_->Updete();
+		//	break;
+
+		//case Scene::kGameOver: // ゲームオーバー
+		//	gameOver_->Updete();
+		//	break;
+
+	default:
+		break;
+	}
+}
+#pragma endregion
+
+#pragma region ゲームの描画
+void DrawScene() {
+	switch (scene) {
+	case Scene::kTitle: // タイトル
+		// LoadDebugSettings();
+
+		title->Draw();
+		break;
+	case Scene::kGame: // ゲーム中
+		// LoadDebugSettings();
+
+		gameScene->Draw();
+		break;
+		//case Scene::kGameClear: // ゲームクリア
+		//	clear_->Draw();
+
+		//	break;
+
+		//case Scene::kGameOver: // ゲームオーバー
+		//	gameOver_->Draw();
+
+		//	break;
+
+	default:
+		break;
+	}
+}
+#pragma endregion
+

@@ -1,10 +1,13 @@
 #include "ImGuiContentBrowser.h"
 #include "../TextureManager/TextureManager.h"
 
+#ifdef USE_IMGUI
+
+
 static const std::filesystem::path sAssetsPath = "resources";
 
 ImGuiContentBrowser::ImGuiContentBrowser()
-	:mCurrentDirectory(sAssetsPath){}
+	:mCurrentDirectory(sAssetsPath) {}
 
 
 bool ImGuiContentBrowser::IsImageFile(const std::filesystem::path& filePath) {
@@ -96,7 +99,7 @@ void ImGuiContentBrowser::update(TextureManager* TextureManager) {
 				if (directoryEntry.is_directory())
 					mCurrentDirectory /= path.filename();
 			}
-		
+
 			ImGui::TextWrapped(filenameString.c_str());
 
 			ImGui::NextColumn();
@@ -114,3 +117,4 @@ void ImGuiContentBrowser::update(TextureManager* TextureManager) {
 	end();
 }
 
+#endif // USE_IMGUI

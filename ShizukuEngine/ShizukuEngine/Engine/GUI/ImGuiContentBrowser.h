@@ -4,9 +4,11 @@
 #include <string>
 #include <unordered_map>
 
+#ifdef USE_IMGUI
+
 class TextureManager;
 
-class ImGuiContentBrowser:public ImGuiUIWindow
+class ImGuiContentBrowser :public ImGuiUIWindow
 {
 public:
 	ImGuiContentBrowser();
@@ -24,3 +26,4 @@ private://変数
 	TextureManager* mTextureManager;
 };
 
+#endif // USE_IMGUI
