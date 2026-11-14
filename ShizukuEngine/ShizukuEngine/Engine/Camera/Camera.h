@@ -51,6 +51,8 @@ public:
     void SetFarPlane(float f) { mFarPlane = f; }
 
     void SetCameraPos(Vector3 cameraPos) { transform.translate = cameraPos; }
+    void SetCameraRot(Vector3 cameraRot) { transform.rotate = cameraRot; }
+
     TransformData transform;
 
 

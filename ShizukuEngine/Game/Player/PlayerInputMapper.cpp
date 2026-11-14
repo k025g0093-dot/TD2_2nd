@@ -1,11 +1,11 @@
 #include "PlayerInputMapper.h"
-PlayerCommand PlayerInputMapper::Make(const Input& input)const {
+PlayerCommand PlayerInputMapper::Make(const Input& input, float dt)const {
 
 	Vector3 move(
-		float (input.GetKey('D') )- float(input.GetKey('A')),
-			0.0f,
-			float(input.GetKey('W') )- float(input.GetKey('S'))
-			);
+		float(input.GetKey('D')) - float(input.GetKey('A')),
+		0.0f,
+		float(input.GetKey('W')) - float(input.GetKey('S'))
+	);
 
 	Vector3 aim(
 		float(input.GetMouseDeltaX()),
@@ -18,17 +18,17 @@ PlayerCommand PlayerInputMapper::Make(const Input& input)const {
 	if (input.IsPadConnected()) {
 
 		Vector3 padMove(input.GetLeftStickX(), 0.0f, input.GetLeftStickY());
-		Vector3 padAim(input.GetRightStickX(), 0.0f, input.GetRightStickY());
+		Vector3 padAim(-input.GetRightStickY(),input.GetRightStickX(), 0.0f);
 
 		if (padMove.Length() > 0.0f) { move = padMove; }
-		if (padAim.Length() > 0.0f) { aim = padAim; }
+		if (padAim.Length() > 0.0f) { aim = padAim*mPadLookSpeed * dt; }
 		if (input.GetPadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)) { fire = true; }
 	}
 
 	PlayerCommand cmd;
 	// 斜め入力で長さ√2 にならないよう、1を超えたら1にそろえる
 	cmd.move = (move.Length() > 1.0f) ? move.Normalized() : move;
-	cmd.aim = aim.Normalized();
+	cmd.aim = aim;
 	cmd.isFire = fire;
 	return cmd;
 

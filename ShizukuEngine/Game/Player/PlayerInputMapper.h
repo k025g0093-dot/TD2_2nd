@@ -4,7 +4,8 @@
 class PlayerInputMapper
 {
 public:
-	PlayerCommand Make(const Input& input)const;
-
+	PlayerCommand Make(const Input& input,float dt)const;
+private:
+	float mPadLookSpeed = 2.0f;
 };
 

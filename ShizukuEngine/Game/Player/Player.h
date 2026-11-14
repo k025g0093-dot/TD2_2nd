@@ -7,7 +7,7 @@ public:
 
 	void Initialize(int model, const Vector3& position);
 
-	void Update(const PlayerCommand& cmd, float dt);
+	void Update(const PlayerCommand& cmd,float yaw, float dt);
 
 	const Vector3& GetPosition() const { return mPosition; }
 	float GetRotationY() const { return mRotationY; }

@@ -80,10 +80,17 @@ void GameScene::Draw() {
 
 void GameScene::Run(float dt) {
 
-	PlayerCommand cmd = mInputMapper.Make(mEngine->GetInput());
-	mPlayer.Update(cmd, dt);
+	PlayerCommand cmd = mInputMapper.Make(mEngine->GetInput(),dt);
+
+	mEngine->GetCamera().SetCameraRot(
+		mFollowCamera.UpdateRotate(cmd.aim)
+	);
+
+
+
+	mPlayer.Update(cmd, mFollowCamera.GetYaw(), dt);
 
 	mEngine->GetCamera().SetCameraPos(
-		mFollowCamera.Update(mPlayer.GetPosition())
+		mFollowCamera.UpdatePos(mPlayer.GetPosition())
 	);
 }
