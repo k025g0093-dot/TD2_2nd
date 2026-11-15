@@ -8,6 +8,7 @@
 #include "Core/LogSistem.h"
 #include "Core/Input.h"
 #include "DirectX/DebugLayer.h"
+#include "DirectX/ComputePipeline.h"
 #include "Camera/Camera.h"
 
 //マネジャクラス
@@ -25,7 +26,8 @@
 #include "Model/Primitive/Sphere.h"
 
 
-#include "Particle/ParticleEmitter.h"
+#include "Particle/ParticleEmitter.h"//通常のパーティクル
+#include "Particle/GPUParticleEmitter.h"//GPU駆動式パーティクル
 #include "DeltaTaime/Clock.h"
 #include "Entity/EntityManager.h"
 
@@ -34,7 +36,6 @@
 #include "Model/3DAnimation/Animator.h"
 
 
-//ComPtr地獄だっきゃくのために必要
 using Microsoft::WRL::ComPtr;
 using namespace std;
 
@@ -97,7 +98,13 @@ public:
 	//エミッターの作成関数（引数はエミッターの情報とモデルの番号）
 	// 色の固定ができますデフォルトはランダムが指定されています
 	//--------------------------------------------------------------
-	int CreateEmitter(const Emitter& emitter, int modelIndex, bool isFixedColor = false);
+	int CreateEmitter(const Emitter& emitter, int modelIndex,Vector4 color ={1.0f,1.0f,1.0f,1.0f}, bool isFixedColor = false);
+
+	//--------------------------------------------------------------
+	//エミッターの作成関数（引数はエミッターの情報とモデルの番号）
+	// 色の固定ができますデフォルトはランダムが指定されています
+	//--------------------------------------------------------------
+	int CreateGPUEmitter(const Emitter& emitter, int modelIndex,Vector4 color ={1.0f,1.0f,1.0f,1.0f}, bool isFixedColor = false);
 
 
 
@@ -137,7 +144,6 @@ public:
 	//モデルパーティクルの描画関数（引数は、モデル番号、位置、回転、スケール、色、テクスチャです）テクスチャは宣言をしなくても平気です
 	//--------------------------------------------------------------
 	void DrawModelParticle(int modelIndex, const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color, int textureIndx = -1);
-
 
 	Camera& GetCamera() { return mCamera; }
 
@@ -180,6 +186,7 @@ private://各種変数などの初期化
 	ImGuiPlayViewportWindow mPlayViewportWindow{};//プレイビューポート用のGUI（ゲーム実行確認）
 	ImGuiContentBrowser mContentBrowser;
 	ImGuiDebugWindow mDebugWindow{};//デバック情報を載せたGUI
+	ImGuiParticleEmitter mImGuiParticleEmitter{};
 
 #endif // USE_IMGUI
 
@@ -199,6 +206,7 @@ private://各種変数などの初期化
 
 	std::vector<EmitterSlot>mEmitters;
 
+	std::vector<std::unique_ptr<GPUParticleEmitter>> mGPUEmitters;
 
 	//デルタタイマーを取得するため
 	Clock mClock;
