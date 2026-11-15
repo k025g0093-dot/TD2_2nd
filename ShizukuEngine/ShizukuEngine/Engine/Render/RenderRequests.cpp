@@ -189,7 +189,7 @@ void RenderRequests::Render3DTarget(
 	}
 
 
-	mShadowPass.Update(mLightManager->GetLight(0));
+	mShadowPass.Update(mLightManager->GetLight(0), mCameraTranslate);
 	mShadowPass.Begin(commandList.Get(), rootSignature.Get());
 	//インスタンスバッファーへのセット
 	commandList->SetGraphicsRootShaderResourceView(
