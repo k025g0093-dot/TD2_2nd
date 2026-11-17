@@ -15,7 +15,10 @@ public:
 		GetKeyboardState(mKeysCurr);
 
 		if (GetKeyDown(VK_CONTROL)) {
-			mIsCursorFree = (!mIsCursorFree)? true:false;
+			mIsCursorFree = (!mIsCursorFree) ? true : false;
+			
+			(!mIsCursorFree) ? HideCursor(): ShowCursorAgain() ;
+
 			mMouseDeltaX = 0;
 			mMouseDeltaY = 0;
 		}
@@ -82,6 +85,15 @@ public:
 		mMouseX = mPoint.x;
 		mMouseY = mPoint.y;
 	}
+
+	void HideCursor() {
+		while (ShowCursor(FALSE) >= 0) {}
+	}
+
+	void ShowCursorAgain() {
+		while (ShowCursor(TRUE) < 0) {}
+	}
+
 
 	// --- ゲームパッド関数 (追加) ---
 
