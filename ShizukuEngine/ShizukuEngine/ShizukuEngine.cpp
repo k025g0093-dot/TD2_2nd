@@ -19,7 +19,7 @@ ShizukuEngine::ShizukuEngine(int width, int Height,  wstring WinName){
 }
 
 //初期化関数
-void ShizukuEngine::Initialize( int width,int Height) {
+void ShizukuEngine::Initialize( int width,int height) {
 
 	// COM は Windows 機能を使うために先に初期化しておく
 	HRESULT hrCo = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -51,11 +51,11 @@ void ShizukuEngine::Initialize( int width,int Height) {
 		mDX12Context.GetDevice(),
 		&mTextureManager,
 		width,
-		Height
+		height
 	);
 
 	//レンダーリクエストの初期化
-	mRenderRequests.CreateOrthographicMatrix(width, Height);
+	mRenderRequests.CreateOrthographicMatrix(width, height);
 	mRenderRequests.InitRender(
 		mDX12Context.GetDevice(),
 		&mTextureManager,
@@ -63,6 +63,8 @@ void ShizukuEngine::Initialize( int width,int Height) {
 		&mDX12Context,
 		&mRenderTexture);
 
+	//マウスの中央を求める
+	mInput.SetWindou(mWinApp.GetHwnd());
 
 	//ImGuiの初期化
 #ifdef USE_IMGUI

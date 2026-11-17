@@ -8,9 +8,10 @@ PlayerCommand PlayerInputMapper::Make(const Input& input, float dt)const {
 	);
 
 	Vector3 aim(
-		float(input.GetMouseDeltaX()),
-		0.0f,
-		float(input.GetMouseDeltaY()));
+		float(input.GetMouseDeltaY()*0.001f),
+		float(input.GetMouseDeltaX()*0.001f),
+		0.0f
+		);
 
 	bool fire = false;
 	if (input.GetMouseButton(0)) { fire = true; }
