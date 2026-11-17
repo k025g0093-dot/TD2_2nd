@@ -151,6 +151,7 @@
     <ClCompile Include="Game\Player\Player.cpp" />
     <ClCompile Include="Game\Player\PlayerInputMapper.cpp" />
     <ClCompile Include="Game\TitleScene.cpp" />
+    <ClCompile Include="Game\SceneManeger.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\GUI\ImGuiContentBrowser.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\Animator.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\Animation.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="Game\Player\PlayerCommand.h" />
     <ClInclude Include="Game\Player\PlayerInputMapper.h" />
     <ClInclude Include="Game\TitleScene.h" />
+    <ClInclude Include="Game\SceneManeger.h" />
     <ClInclude Include="ShizukuEngine\Engine\GUI\ImGuiContentBrowser.h" />
     <ClInclude Include="ShizukuEngine\Engine\Model\3DAnimation\Animator.h" />
     <ClInclude Include="ShizukuEngine\Engine\Model\3DAnimation\Animation.h" />
