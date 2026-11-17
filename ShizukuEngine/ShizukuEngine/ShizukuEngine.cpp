@@ -190,8 +190,6 @@ void ShizukuEngine::Update() {
 	for (auto& animator : mAnimator){
 		animator->UpdateAnimation(deltaTime);
 	}
-
-
 }
 
 //開放処理
@@ -266,7 +264,8 @@ void ShizukuEngine::PostDraw()
 	mImGuiManager.RenderPlatformWindows();
 #endif // USE_IMGUI
 
-	//mClock.UpdateFixFPS();
+	//FPS固定
+	mClock.UpdateFixFPS();
 
 }
 
