@@ -14,15 +14,21 @@ public:
 		memcpy(mKeysPrev, mKeysCurr, 256);
 		GetKeyboardState(mKeysCurr);
 
-		// --- マウス ---
-		POINT point;
-		GetCursorPos(&point);
+		if (GetKeyDown(VK_CONTROL)) {
+			mIsCursorFree = (!mIsCursorFree)? true:false;
+			mMouseDeltaX = 0;
+			mMouseDeltaY = 0;
+		}
 
-		mMouseDeltaX = point.x - mMouseX;
-		mMouseDeltaY = point.y - mMouseY;
+		if (!mIsCursorFree) {
+			// --- マウス ---
+			GetCursorPos(&mPoint);
 
-		mMouseX = point.x;
-		mMouseY = point.y;
+			mMouseDeltaX = mPoint.x - mMouseX;
+			mMouseDeltaY = mPoint.y - mMouseY;
+
+			RecenterCursor();
+		}
 
 		// --- ゲームパッド (追加) ---
 		mPadPrev = mPadCurr; // 前フレームの状態を保存
@@ -57,9 +63,24 @@ public:
 	//マウスのY座標を取得する関数
 	int GetMouseDeltaY() const { return mMouseDeltaY; }
 	//マウスのボタンが押されているかを確認する関数（0:左ボタン、1:右ボタン、2:中ボタン）
-	bool GetMouseButton(int button) const{
+	bool GetMouseButton(int button) const {
 		int vKey = (button == 0) ? VK_LBUTTON : (button == 1) ? VK_RBUTTON : VK_MBUTTON;
 		return (mKeysCurr[vKey] & 0x80) != 0;
+	}
+
+	void SetWindou(HWND hwnd) {
+		mhwnd = hwnd;
+	}
+
+	void RecenterCursor() {
+		RECT rect;
+		GetClientRect(mhwnd, &rect);
+		mPoint.x = rect.right / 2;
+		mPoint.y = rect.bottom / 2;
+		ClientToScreen(mhwnd, &mPoint);
+		SetCursorPos((int)mPoint.x, (int)mPoint.y);
+		mMouseX = mPoint.x;
+		mMouseY = mPoint.y;
 	}
 
 	// --- ゲームパッド関数 (追加) ---
@@ -122,6 +143,11 @@ private:
 	int mMouseY = 0;
 	int mMouseDeltaX = 0;
 	int mMouseDeltaY = 0;
+
+	bool mIsCursorFree = false;
+
+	HWND mhwnd = nullptr;
+	POINT mPoint;
 
 	// ゲームパッド管理 (追加)
 	bool mIsPadConnected = false;

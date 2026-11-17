@@ -150,9 +150,9 @@ public:
 private://ヘルパー関数など内部関数がメイン
 
 	//ヘルパー関数
-	const Matrix4x4& GetViewProjectionMatrix() const { return mViewProjectionMatrix; }
-
 	void DrawEmitter();
+
+	const Matrix4x4& GetViewProjectionMatrix() const { return mViewProjectionMatrix; }
 
 	void OnFileDropped(const std::wstring& path);
 
