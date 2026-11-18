@@ -19,7 +19,7 @@ ShizukuEngine::ShizukuEngine(int width, int Height,  wstring WinName){
 }
 
 //初期化関数
-void ShizukuEngine::Initialize( int width,int height) {
+void ShizukuEngine::Initialize( int width,int Height) {
 
 	// COM は Windows 機能を使うために先に初期化しておく
 	HRESULT hrCo = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -51,11 +51,11 @@ void ShizukuEngine::Initialize( int width,int height) {
 		mDX12Context.GetDevice(),
 		&mTextureManager,
 		width,
-		height
+		Height
 	);
 
 	//レンダーリクエストの初期化
-	mRenderRequests.CreateOrthographicMatrix(width, height);
+	mRenderRequests.CreateOrthographicMatrix(width, Height);
 	mRenderRequests.InitRender(
 		mDX12Context.GetDevice(),
 		&mTextureManager,
@@ -63,7 +63,6 @@ void ShizukuEngine::Initialize( int width,int height) {
 		&mDX12Context,
 		&mRenderTexture);
 
-	//マウスの中央を求める
 	mInput.SetWindou(mWinApp.GetHwnd());
 
 	//ImGuiの初期化
@@ -264,8 +263,7 @@ void ShizukuEngine::PostDraw()
 	mImGuiManager.RenderPlatformWindows();
 #endif // USE_IMGUI
 
-	//FPS固定
-	mClock.UpdateFixFPS();
+	//mClock.UpdateFixFPS();
 
 }
 
@@ -321,6 +319,18 @@ void ShizukuEngine::DrawSphere
 	req.lightId = 1;
 	req.isMesh = false;//メッシュかの確認
 	mRenderRequests.DrawRequestsSubmission(req);
+}
+#pragma endregion
+
+#pragma region 線描画関数
+
+void ShizukuEngine::DrawLine
+(
+	const Vector3& start,
+	Vector3 end,
+	const Vector4 color
+) {
+	mRenderRequests.AddLine(start, end, color);
 }
 #pragma endregion
 

@@ -16,8 +16,8 @@ public:
 
 		if (GetKeyDown(VK_CONTROL)) {
 			mIsCursorFree = (!mIsCursorFree) ? true : false;
-			
-			(!mIsCursorFree) ? HideCursor(): ShowCursorAgain() ;
+
+			(!mIsCursorFree) ? HideCursor() : ShowCursorAgain();
 
 			mMouseDeltaX = 0;
 			mMouseDeltaY = 0;

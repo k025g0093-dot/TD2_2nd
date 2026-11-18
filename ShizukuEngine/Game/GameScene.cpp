@@ -59,15 +59,16 @@ void GameScene::Draw() {
 
 	mFade->Draw();
 
-	mEngine->DrawSkinnedModel(
-		player,
-		dancce,
-		mPlayer.GetPosition(),
-		{ 0.0f, mPlayer.GetRotationY(), 0.0f},
-		{ 1.0f, 1.0f, 1.0f },
-		{ 1.0f, 1.0f, 1.0f, 1.0f }
-	);
-
+	for (int i = 0; i < 30; i++) {
+		mEngine->DrawSkinnedModel(
+			player,
+			dancce,
+			mPlayer.GetPosition()+i,
+			{ 0.0f, mPlayer.GetRotationY(), 0.0f },
+			{ 1.0f, 1.0f, 1.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f }
+		);
+	}
 	mEngine->DrawModel(
 		field,
 		{ 0,0,0 },

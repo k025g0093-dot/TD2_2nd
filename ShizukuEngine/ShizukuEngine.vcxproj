@@ -156,6 +156,7 @@
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\Animator.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\Animation.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\Bone.cpp" />
+    <ClCompile Include="ShizukuEngine\Engine\Model\Primitive\Line.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Particle\GPUParticleEmitter.cpp" />
     <ClCompile Include="ShizukuEngine\Engine\Particle\GPUParticleManager.cpp" />
     <ClCompile Include="ShizukuEngine\Entity\EntityManager.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="ShizukuEngine\Engine\Model\3DAnimation\Animator.h" />
     <ClInclude Include="ShizukuEngine\Engine\Model\3DAnimation\Animation.h" />
     <ClInclude Include="ShizukuEngine\Engine\Model\3DAnimation\Bone.h" />
+    <ClInclude Include="ShizukuEngine\Engine\Model\Primitive\Line.h" />
     <ClInclude Include="ShizukuEngine\Engine\Particle\GPUParticleEmitter.h" />
     <ClInclude Include="ShizukuEngine\Engine\Particle\GPUParticleManager.h" />
     <ClInclude Include="ShizukuEngine\Engine\Particle\ParticleTypes.h" />

@@ -32,7 +32,6 @@ LRESULT CALLBACK WindowProc(
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-		break;
 	}
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
