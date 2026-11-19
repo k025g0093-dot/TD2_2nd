@@ -6,6 +6,7 @@ struct PlayerCommand
 	Vector3 move{};
 	Vector3 aim{};
 	bool isFire = false;
+	bool isDodge = false;
 };
 
 

@@ -24,7 +24,7 @@ void TitleScene::Update(float dt) {
 		break;
 	case Phese::kMain:
 
-		if (mEngine->GetInput().GetKeyDown(VK_SPACE)) {
+		if (mEngine->GetInput().GetKeyDown(VK_SPACE) || mEngine->GetInput().GetPadButtonDown(XINPUT_GAMEPAD_A)) {
 			mFade->Start(Fade::Status::FadeOut, 1.0f);
 			mPhese=Phese::kFadeOut;
 		}
