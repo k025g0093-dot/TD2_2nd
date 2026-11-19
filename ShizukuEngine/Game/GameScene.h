@@ -4,6 +4,7 @@
 #include "Fade.h"
 #include "Player/Player.h"
 #include "Player/PlayerInputMapper.h"
+#include "Enemy/Enemy.h"
 #include "FollowCamera.h"
 
 class GameScene : public IScene
@@ -31,6 +32,8 @@ private:
 	Player mPlayer;
 	PlayerInputMapper mInputMapper;
 
+	Enemy mEnemy;
+
 	FollowCamera mFollowCamera;
 
 	//素材（モデルど）int型で指定
@@ -38,6 +41,8 @@ private:
 	int field = 0;
 	int player = 0;
 	int dancce = 0;
+	int enemy = 0;
+	int enemyAnimation = 0;
 	//ゲームの状態
 	bool isFinished = false;
 

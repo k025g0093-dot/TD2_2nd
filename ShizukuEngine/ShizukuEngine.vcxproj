@@ -145,6 +145,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Enemy\Enemy.cpp" />
     <ClCompile Include="Game\Fade.cpp" />
     <ClCompile Include="Game\FollowCamera.cpp" />
     <ClCompile Include="Game\GameScene.cpp" />
@@ -197,6 +198,7 @@
     <ClCompile Include="ShizukuEngine\Engine\Model\3DAnimation\SkinnedModel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Enemy\Enemy.h" />
     <ClInclude Include="Game\Fade.h" />
     <ClInclude Include="Game\FollowCamera.h" />
     <ClInclude Include="Game\GameScene.h" />
