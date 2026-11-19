@@ -14,6 +14,8 @@ PlayerCommand PlayerInputMapper::Make(const Input& input, float dt)const {
 		);
 
 	bool fire = false;
+	bool dodge = false;
+
 	if (input.GetMouseButton(0)) { fire = true; }
 
 	if (input.IsPadConnected()) {
@@ -24,6 +26,7 @@ PlayerCommand PlayerInputMapper::Make(const Input& input, float dt)const {
 		if (padMove.Length() > 0.0f) { move = padMove; }
 		if (padAim.Length() > 0.0f) { aim = padAim*mPadLookSpeed * dt; }
 		if (input.GetPadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)) { fire = true; }
+		if (input.GetPadButton(XINPUT_GAMEPAD_B)) { dodge = true; }
 	}
 
 	PlayerCommand cmd;
@@ -31,6 +34,7 @@ PlayerCommand PlayerInputMapper::Make(const Input& input, float dt)const {
 	cmd.move = (move.Length() > 1.0f) ? move.Normalized() : move;
 	cmd.aim = aim;
 	cmd.isFire = fire;
+	cmd.isDodge = dodge;
 	return cmd;
 
 }

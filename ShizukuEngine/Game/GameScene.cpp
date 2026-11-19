@@ -1,5 +1,8 @@
 #include "GameScene.h"
 
+#include <cstdio>
+#include <Windows.h>
+
 void GameScene::Initialize(ShizukuEngine* engine) {
 	mEngine = engine;
 

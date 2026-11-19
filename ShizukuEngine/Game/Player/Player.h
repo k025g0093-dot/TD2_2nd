@@ -30,6 +30,19 @@ private:
 	float mFireTimer = 0.0f;
 	bool mShotThisFrame = false;
 
+	// 回避
+	bool mIsDodging = false;
+	bool mPrevDodgeButton = false;
+
+	Vector3 mDodgeDirection{};
+
+	float mDodgeSpeed = 30.0f;
+	float mDodgeDuration = 0.25f;
+	float mDodgeTimer = 0.0f;
+
+	float mDodgeCooldown = 0.5f;
+	float mDodgeCooldownTimer = 0.0f;
+
 	static constexpr float kFieldHalf = 99.0f; // 壁の内側が ±100、自機の半径ぶん内側
 
 };
