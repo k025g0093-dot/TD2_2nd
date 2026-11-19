@@ -16,7 +16,11 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	mPlayer.Initialize(player, dancce,Vector3{ 0.0f,0.0f,0.0f });
 	mFollowCamera.Initialize(mPlayer.GetPosition());
 
+	// 敵
+	enemy = mEngine->LoadModel("resources/Flair/Flair.dae");
+	enemyAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", enemy);
 
+	mEnemy.Initialize(enemy, enemyAnimation, { 5.0f, 0.0f, 5.0f });
 }
 
 void GameScene::Update(float dt) {
@@ -60,6 +64,8 @@ void GameScene::Draw() {
 	mFade->Draw();
 
 	mPlayer.Draw(mEngine);
+
+	mEnemy.Draw(mEngine);
 
 	mEngine->DrawModel(
 		field,
