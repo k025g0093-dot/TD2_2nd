@@ -1,13 +1,17 @@
 #pragma once
 #include "PlayerCommand.h"
 
+class ShizukuEngine;
+
 class Player
 {
 public:
 
-	void Initialize(int model, const Vector3& position);
+	void Initialize(int model, int animation,const Vector3& position);
 
 	void Update(const PlayerCommand& cmd,float yaw, float dt);
+
+	void Draw(ShizukuEngine* engine);
 
 	const Vector3& GetPosition() const { return mPosition; }
 	float GetRotationY() const { return mRotationY; }
@@ -17,6 +21,7 @@ public:
 private:
 
 	int mModel = -1;
+	int mAnimation = -1;
 	Vector3 mPosition{};
 	float mRotationY = 0.0f;
 

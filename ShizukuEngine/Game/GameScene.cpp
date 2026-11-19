@@ -13,7 +13,7 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	player = mEngine->LoadSkinnedModel("resources/Flair/Flair.dae");
 	dancce= mEngine->LoadAnimation("resources/Flair/Flair.dae", player);
 
-	mPlayer.Initialize(player, Vector3{ 0.0f,0.0f,0.0f });
+	mPlayer.Initialize(player, dancce,Vector3{ 0.0f,0.0f,0.0f });
 	mFollowCamera.Initialize(mPlayer.GetPosition());
 
 
@@ -59,16 +59,8 @@ void GameScene::Draw() {
 
 	mFade->Draw();
 
-	for (int i = 0; i < 30; i++) {
-		mEngine->DrawSkinnedModel(
-			player,
-			dancce,
-			mPlayer.GetPosition()+i,
-			{ 0.0f, mPlayer.GetRotationY(), 0.0f },
-			{ 1.0f, 1.0f, 1.0f },
-			{ 1.0f, 1.0f, 1.0f, 1.0f }
-		);
-	}
+	mPlayer.Draw(mEngine);
+
 	mEngine->DrawModel(
 		field,
 		{ 0,0,0 },
