@@ -508,7 +508,7 @@ void RenderRequests::BindTexture(ID3D12GraphicsCommandList* commandList, int tex
 }
 
 void RenderRequests::SetBoneMatrices(const std::vector<Matrix4x4>& matrix, int slot) {
-	if (slot < 0 || mMaxSkinnedModelCount <= slot) { return; }
+	if (slot < 0 || mMaxSkinnedModelCount < slot) { return; }
 
 	std::memcpy(mMappedBoneMatrices + slot * kMaxBones, matrix.data(), sizeof(Matrix4x4) * matrix.size());
 }

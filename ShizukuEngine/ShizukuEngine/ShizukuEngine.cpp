@@ -1,25 +1,26 @@
 #include "ShizukuEngine.h"
+#include "Collision/BoneCollider.h"
 
 using namespace std;
 //インスタンス初期化
 ShizukuEngine* ShizukuEngine::mInstance = nullptr;
 
-void ShizukuEngine::GetInstance(int width, int Height,wstring WinName) {
+void ShizukuEngine::GetInstance(int width, int Height, wstring WinName) {
 	if (mInstance == nullptr) {
 		//インスタンスがない場合はnewをする
 		mInstance = new ShizukuEngine(Height, width, WinName);
 	}
 }
 
-ShizukuEngine::ShizukuEngine(int width, int Height,  wstring WinName){
+ShizukuEngine::ShizukuEngine(int width, int Height, wstring WinName) {
 	mHeight = Height;
 	mWidth = width;
 	mWinApp.InitWindow(width, Height, WinName);
-	Initialize(width,Height);
+	Initialize(width, Height);
 }
 
 //初期化関数
-void ShizukuEngine::Initialize( int width,int Height) {
+void ShizukuEngine::Initialize(int width, int Height) {
 
 	// COM は Windows 機能を使うために先に初期化しておく
 	HRESULT hrCo = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -45,7 +46,7 @@ void ShizukuEngine::Initialize( int width,int Height) {
 	mTextureManager.LoadTexture("resources/white1x1.png");
 
 	mLightManager.Initialize(mDX12Context.GetDevice());
-	mModelManager.Initialize(mDX12Context.GetDevice(),&mTextureManager);
+	mModelManager.Initialize(mDX12Context.GetDevice(), &mTextureManager);
 
 	mRenderTexture.CreateSceneRtv(
 		mDX12Context.GetDevice(),
@@ -120,28 +121,28 @@ void ShizukuEngine::OnFileDropped(const std::wstring& path) {
 		int model = mModelManager.Load(modelPath);
 		int skinnedModel = mModelManager.LoadSkinnedModel(modelPath);
 
-		if (model !=-1|| skinnedModel!=-1) {
+		if (model != -1 || skinnedModel != -1) {
 
 		}
 
 	}
 }
 
-int ShizukuEngine::CreateEmitter(const Emitter& emitter, int modelIndex,Vector4 color,bool isFixedColor) {
+int ShizukuEngine::CreateEmitter(const Emitter& emitter, int modelIndex, Vector4 color, bool isFixedColor) {
 
 	auto particleEmitter = std::make_unique<ParticleEmitter>();
-	particleEmitter->CreateEmitter(emitter, color,isFixedColor);
+	particleEmitter->CreateEmitter(emitter, color, isFixedColor);
 
 	mEmitters.push_back({ std::move(particleEmitter),modelIndex });
 	return static_cast<int>(mEmitters.size()) - 1;
 }
 
-int ShizukuEngine::CreateGPUEmitter(const Emitter& emitter, int modelIndex,Vector4 color,bool isFixedColor) {
+int ShizukuEngine::CreateGPUEmitter(const Emitter& emitter, int modelIndex, Vector4 color, bool isFixedColor) {
 
 	auto particleEmitter = std::make_unique<GPUParticleEmitter>();
 	MeshModel* model = mModelManager.Get(modelIndex);
-	if (model == nullptr) {return -1;}//モデルが見つからない場合はリターンする
-	particleEmitter->CreateEmitter(emitter, mDX12Context.GetDevice(),&mTextureManager, model->GetTextureIndex(), model,color, isFixedColor);
+	if (model == nullptr) { return -1; }//モデルが見つからない場合はリターンする
+	particleEmitter->CreateEmitter(emitter, mDX12Context.GetDevice(), &mTextureManager, model->GetTextureIndex(), model, color, isFixedColor);
 
 	mGPUEmitters.push_back(std::move(particleEmitter));
 	return static_cast<int>(mGPUEmitters.size()) - 1;
@@ -171,8 +172,12 @@ int ShizukuEngine::LoadAnimation(const std::string& animationPath, int skinnedMo
 
 	mRenderRequests.EnsureSkinnedCapacity(static_cast<int>(mAnimator.size()));
 
-	return static_cast<int>(mAnimations.size())-1;
+	return static_cast<int>(mAnimations.size()) - 1;
 }
+
+void ShizukuEngine::CreateCollision(
+	int modelIndex, int boneSlot,
+	const Vector3& pos, const Vector3& rot, const Vector3& scale) {}
 
 
 void ShizukuEngine::Update() {
@@ -186,7 +191,7 @@ void ShizukuEngine::Update() {
 		slot.emitter->Update(deltaTime);
 	}
 
-	for (auto& animator : mAnimator){
+	for (auto& animator : mAnimator) {
 		animator->UpdateAnimation(deltaTime);
 	}
 }
@@ -195,7 +200,7 @@ void ShizukuEngine::Update() {
 ShizukuEngine::~ShizukuEngine() {}
 
 
-void ShizukuEngine::PreDraw() 
+void ShizukuEngine::PreDraw()
 {
 	mDX12Context.PreDraw();
 #ifdef USE_IMGUI
@@ -206,7 +211,7 @@ void ShizukuEngine::PreDraw()
 
 #pragma region postDraw
 
-void ShizukuEngine::PostDraw() 
+void ShizukuEngine::PostDraw()
 {
 
 	DrawEmitter();
@@ -218,11 +223,11 @@ void ShizukuEngine::PostDraw()
 	mModelWindow.update(&mModelManager);
 	mContentBrowser.update(&mTextureManager);
 
-	for (size_t i = 0; i < mEmitters.size();i++) {
-		mImGuiParticleEmitter.Update(mEmitters[i].modelIndex,mEmitters[i].emitter.get());
+	for (size_t i = 0; i < mEmitters.size(); i++) {
+		mImGuiParticleEmitter.Update(mEmitters[i].modelIndex, mEmitters[i].emitter.get());
 	}
 
-	mViewportWindow.update(&mRenderTexture,&mEntityManager,&mContentBrowser);
+	mViewportWindow.update(&mRenderTexture, &mEntityManager, &mContentBrowser);
 	mPlayViewportWindow.update(&mRenderTexture);
 
 	DebugStats stats{};
@@ -263,7 +268,7 @@ void ShizukuEngine::PostDraw()
 	mImGuiManager.RenderPlatformWindows();
 #endif // USE_IMGUI
 
-	//mClock.UpdateFixFPS();
+	mClock.UpdateFixFPS();
 
 }
 
@@ -274,7 +279,7 @@ void ShizukuEngine::PostDraw()
 void ShizukuEngine::DrawTriangle
 (
 	const Vector3& pos,
-	const Vector3& rot, 
+	const Vector3& rot,
 	const Vector3& scale,
 	const Vector4 color,
 	int textureInd
@@ -300,7 +305,7 @@ void ShizukuEngine::DrawTriangle
 void ShizukuEngine::DrawSphere
 (
 	const Vector3& pos,
-	const Vector3& rot, 
+	const Vector3& rot,
 	const Vector3& scale,
 	const Vector4 color,
 	int textureInd
@@ -338,9 +343,9 @@ void ShizukuEngine::DrawLine
 
 void ShizukuEngine::DrawSprite
 (
-	const Vector2& pos, 
+	const Vector2& pos,
 	const float& rot,
-	const float& width, 
+	const float& width,
 	const float& height,
 	const Vector4 color,
 	int textureInd
@@ -349,7 +354,7 @@ void ShizukuEngine::DrawSprite
 		mSprite = std::make_unique<Sprite>();
 		mSprite->Initialization(mDX12Context.GetDevice());
 	}
-	
+
 	DrawRequest req;
 	req.model = mSprite.get();
 	req.pos = { pos.x,pos.y,0 };
@@ -384,7 +389,7 @@ void ShizukuEngine::DrawModel
 	req.rot = rot;//回転度を渡す
 	req.scale = scale;//スケールを渡す
 	req.color = color;//色を渡す
-	if(textureIndx==-1){
+	if (textureIndx == -1) {
 		req.textureIndex = model->GetTextureIndex();
 	}
 	else {
@@ -416,7 +421,7 @@ void ShizukuEngine::DrawModelParticle
 	req.scale = scale;//スケールを渡す
 	req.color = color;//色を渡す
 	req.isParticle = true;
-	if(textureIndx==-1){
+	if (textureIndx == -1) {
 		req.textureIndex = model->GetTextureIndex();
 	}
 	else {
@@ -451,7 +456,7 @@ void ShizukuEngine::DrawSkinnedModel
 	req.scale = scale;//スケールを渡す
 	req.color = color;//色を渡す
 	req.isSkinnedModel = true;
-	if(textureIndx==-1){
+	if (textureIndx == -1) {
 		req.textureIndex = model->GetTextureIndex();
 	}
 	else {
@@ -463,7 +468,7 @@ void ShizukuEngine::DrawSkinnedModel
 
 #pragma region パーティクル用モデル描画関数
 
-void ShizukuEngine::DrawEmitter() 
+void ShizukuEngine::DrawEmitter()
 {
 
 	for (const EmitterSlot& slot : mEmitters) {
