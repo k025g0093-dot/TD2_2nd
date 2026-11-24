@@ -10,7 +10,6 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	mFade->Initialize(mEngine);
 	mFade->Start(Fade::Status::FadeIn, 1.0f);
 
-
 	//モデル読み込み
 	field = mEngine->LoadModel("resources/field/field.obj");
 	player = mEngine->LoadSkinnedModel("resources/Flair/Flair.dae");
@@ -23,7 +22,16 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	enemy = mEngine->LoadModel("resources/Flair/Flair.dae");
 	enemyAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", enemy);
 
-	mEnemy.Initialize(enemy, enemyAnimation, { 5.0f, 0.0f, 5.0f });
+	mEnemies.clear();
+
+	mSpawnTimer = 0.0f;
+	mSpawnCount = 0;
+
+	// ボス
+	bossModel = mEngine->LoadModel("resources/Flair/Flair.dae");
+	bossAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", bossModel);
+
+	mBoss.Initialize(bossModel, bossAnimation, { 5.0f, 0.0f, 5.0f });
 }
 
 void GameScene::Update(float dt) {
@@ -68,7 +76,11 @@ void GameScene::Draw() {
 
 	mPlayer.Draw(mEngine);
 
-	mEnemy.Draw(mEngine);
+	mBoss.Draw(mEngine);
+
+	for (Enemy& enemy : mEnemies) {
+		enemy.Draw(mEngine);
+	}
 
 	mEngine->DrawModel(
 		field,
@@ -88,11 +100,74 @@ void GameScene::Run(float dt) {
 		mFollowCamera.UpdateRotate(cmd.aim)
 	);
 
-
-
 	mPlayer.Update(cmd, mFollowCamera.GetYaw(), dt);
 
 	mEngine->GetCamera().SetCameraPos(
 		mFollowCamera.UpdatePos(mPlayer.GetPosition())
 	);
+
+	mBoss.Update(mPlayer.GetPosition(), dt);
+
+	for (Enemy& enemy : mEnemies) {
+		enemy.Update(mPlayer.GetPosition(), dt);
+	}
+
+	// ザコ敵出現タイマー
+	mSpawnTimer += dt;
+
+	if (mSpawnTimer >= mSpawnInterval) {
+
+		mSpawnTimer = 0.0f;
+
+		if (mEnemies.size() < kMaxEnemies) {
+			SpawnEnemy();
+		}
+	}
+}
+
+void GameScene::SpawnEnemy() {
+
+	Vector3 spawnPosition{};
+
+	// フィールドの四隅付近から順番に出現
+	switch (mSpawnCount % 4) {
+
+	case 0:
+		spawnPosition = { 50.0f, 0.0f, 50.0f };
+		break;
+
+	case 1:
+		spawnPosition = { -50.0f, 0.0f, 50.0f };
+		break;
+
+	case 2:
+		spawnPosition = { 50.0f, 0.0f, -50.0f };
+		break;
+
+	case 3:
+		spawnPosition = { -50.0f, 0.0f, -50.0f };
+		break;
+	}
+
+	// 敵の種類
+	Enemy::Type type = Enemy::Type::kChase;
+
+	// 2体に1体を遠距離型にする
+	if (mSpawnCount % 5 == 1) {
+		type = Enemy::Type::kRanged;
+	}
+
+	// ザコ敵生成
+	Enemy newEnemy;
+
+	newEnemy.Initialize(
+		enemy,
+		enemyAnimation,
+		spawnPosition,
+		type
+	);
+
+	mEnemies.push_back(newEnemy);
+
+	mSpawnCount++;
 }
