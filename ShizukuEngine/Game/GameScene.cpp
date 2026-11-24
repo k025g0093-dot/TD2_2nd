@@ -14,6 +14,7 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	field = mEngine->LoadModel("resources/field/field.obj");
 	player = mEngine->LoadSkinnedModel("resources/Flair/Flair.dae");
 	dancce= mEngine->LoadAnimation("resources/Flair/Flair.dae", player);
+	dancce = mEngine->CreateAnimator(dancce);
 
 	mPlayer.Initialize(player, dancce,Vector3{ 0.0f,0.0f,0.0f });
 	mFollowCamera.Initialize(mPlayer.GetPosition());
@@ -21,6 +22,7 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	// 敵
 	enemy = mEngine->LoadModel("resources/Flair/Flair.dae");
 	enemyAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", enemy);
+	enemyAnimation = mEngine->CreateAnimator(enemy);
 
 	mEnemies.clear();
 
@@ -30,6 +32,7 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	// ボス
 	bossModel = mEngine->LoadModel("resources/Flair/Flair.dae");
 	bossAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", bossModel);
+	bossAnimation = mEngine->CreateAnimator( bossModel);
 
 	mBoss.Initialize(bossModel, bossAnimation, { 5.0f, 0.0f, 5.0f });
 }
