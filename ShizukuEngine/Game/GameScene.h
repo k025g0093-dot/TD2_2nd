@@ -5,7 +5,10 @@
 #include "Player/Player.h"
 #include "Player/PlayerInputMapper.h"
 #include "Enemy/Enemy.h"
+#include "Enemy/Boss.h"
 #include "FollowCamera.h"
+
+#include <vector>
 
 class GameScene : public IScene
 {
@@ -21,6 +24,9 @@ public:
 private:
 	void Run(float dt);
 
+	// ザコ敵の出現
+	void SpawnEnemy();
+
 private:
 
 	ShizukuEngine* mEngine = nullptr;
@@ -32,17 +38,28 @@ private:
 	Player mPlayer;
 	PlayerInputMapper mInputMapper;
 
-	Enemy mEnemy;
-
 	FollowCamera mFollowCamera;
+
+	Boss mBoss;
+	std::vector<Enemy> mEnemies;
+
+	float mSpawnTimer = 0.0f;
+	float mSpawnInterval = 3.0f;
+	int mSpawnCount = 0;
+	static constexpr int kMaxEnemies = 20;
 
 	//素材（モデルど）int型で指定
 
 	int field = 0;
 	int player = 0;
 	int dancce = 0;
+
 	int enemy = 0;
 	int enemyAnimation = 0;
+
+	int bossModel = 0;
+	int bossAnimation = 0;
+
 	//ゲームの状態
 	bool isFinished = false;
 
