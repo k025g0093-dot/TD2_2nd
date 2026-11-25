@@ -197,12 +197,16 @@ public:
 	//--------------------------------------------------------------
 	bool IsAnimationOBBToOBB(const std::vector<OBB>& obb1, const OBB& obb2);
 
-
+	//--------------------------------------------------------------
+	//OBBとOBBの当たり判定関数
+	//--------------------------------------------------------------
+	bool IsOBBToOBB(const OBB& obb1, const OBB& obb2);
 
 	//-----------------------------------getter、セッター関数-----------------------------------//
 
 
-
+	//-----------------------------------ランダム関数などの便利関数-----------------------------------//
+	float RandomFloat(float min, float max);
 
 private://ヘルパー関数など内部関数がメイン
 
@@ -270,6 +274,8 @@ private://各種変数などの初期化
 
 	//デルタタイマーを取得するため
 	Clock mClock;
+
+	RandomEngine* mRandomEngine{};
 
 	Matrix4x4 mViewProjectionMatrix;
 	Vector3 mShadowCenter{};
