@@ -126,6 +126,8 @@ void GameScene::Run(float dt) {
 			SpawnEnemy();
 		}
 	}
+
+	AllCollision();
 }
 
 void GameScene::SpawnEnemy() {
