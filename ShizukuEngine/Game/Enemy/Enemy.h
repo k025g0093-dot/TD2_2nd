@@ -35,7 +35,13 @@ public:
 
     void Draw(ShizukuEngine* engine);
 
+    float GetCollisionRadius() const { return 1.2f; }
     const Vector3& GetPosition() const { return mPosition; }
+
+    // 敵の位置を変更
+    void SetPosition(const Vector3& position) {
+        mPosition = position;
+    }
 
 private:
 

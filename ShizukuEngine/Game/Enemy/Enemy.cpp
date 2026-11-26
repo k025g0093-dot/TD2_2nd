@@ -224,7 +224,7 @@ void Enemy::Draw(ShizukuEngine* engine) {
             mAnimation,
             mPosition,
             { 0.0f, mRotationY, 0.0f },
-            { 1.3f, 1.3f, 1.3f },
+            { 1.0f, 1.0f, 1.0f },
             { 0.8f, 0.25f, 1.0f, 1.0f }
         );
     }

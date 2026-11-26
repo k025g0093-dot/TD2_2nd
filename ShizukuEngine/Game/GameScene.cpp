@@ -118,12 +118,14 @@ void GameScene::Run(float dt) {
 
 	mBoss.Update(mPlayer.GetPosition(), dt);
 
-	// エリート召喚
-	if (mBoss.ConsumeSummonRequest()) {
-		SpawnEliteEnemy();
+	// 敵の移動前の位置を保存
+	mEnemyOldPositions.clear();
+
+	for (Enemy& enemy : mEnemies) {
+		mEnemyOldPositions.push_back(enemy.GetPosition());
 	}
 
-	// ザコ敵・エリートの更新
+	// 敵の更新
 	for (Enemy& enemy : mEnemies) {
 		enemy.Update(mPlayer.GetPosition(), dt);
 	}
@@ -298,31 +300,143 @@ void GameScene::BossToPlayerCollision() {
 
 }
 
-
 void GameScene::EnemyToEnemyCollision() {
 
-	for (Enemy& enemy : mEnemies) {
+	// 移動前の位置が保存されていなければ処理しない
+	if (mEnemyOldPositions.size() != mEnemies.size()) {
+		return;
+	}
+
+	// 移動先が他の敵と重なるかを調べる
+	auto IsBlocked = [&](size_t index, const Vector3& position) {
 
 		OBB enemyObb1{};
-		enemyObb1.center = enemy.GetPosition();
+		enemyObb1.center = position;
 		enemyObb1.orientations[0] = { 1,0,0 };
-		enemyObb1.orientations[1] = { 0,1,1 };
+		enemyObb1.orientations[1] = { 0,1,0 };
 		enemyObb1.orientations[2] = { 0,0,1 };
 		enemyObb1.size = { 1.0f,1.0f,1.0f };
 
-		OBB enemyObb2{};
-		enemyObb2.center = enemy.GetPosition();
-		enemyObb2.orientations[0] = { 1,0,0 };
-		enemyObb2.orientations[1] = { 0,1,1 };
-		enemyObb2.orientations[2] = { 0,0,1 };
-		enemyObb2.size = { 1.0f,1.0f,1.0f };
+		for (size_t j = 0; j < mEnemies.size(); j++) {
 
-		if (mEngine->IsOBBToOBB(enemyObb1, enemyObb2)) {
+			if (index == j) {
+				continue;
+			}
 
-			/*TODO　敵同士が重ならないようにする処理で*/
+			OBB enemyObb2{};
+			enemyObb2.center = mEnemies[j].GetPosition();
+			enemyObb2.orientations[0] = { 1,0,0 };
+			enemyObb2.orientations[1] = { 0,1,0 };
+			enemyObb2.orientations[2] = { 0,0,1 };
+			enemyObb2.size = { 1.0f,1.0f,1.0f };
 
+			if (mEngine->IsOBBToOBB(enemyObb1, enemyObb2)) {
+				return true;
+			}
 		}
 
-	}
+		return false;
+		};
 
+	// 敵を1体ずつ確認
+	for (size_t i = 0; i < mEnemies.size(); i++) {
+
+		Enemy& enemy = mEnemies[i];
+
+		Vector3 oldPosition = mEnemyOldPositions[i];
+		Vector3 nextPosition = enemy.GetPosition();
+
+		// 今回のフレームで進もうとした距離
+		float dx = nextPosition.x - oldPosition.x;
+		float dz = nextPosition.z - oldPosition.z;
+
+		float distance = std::sqrt(dx * dx + dz * dz);
+
+		// 移動していない敵は処理しない
+		if (distance <= 0.0001f) {
+			continue;
+		}
+
+		// 重ならなければ普通に移動
+		if (!IsBlocked(i, nextPosition)) {
+			continue;
+		}
+
+		// いったん移動前の位置に戻す
+		enemy.SetPosition(oldPosition);
+
+		// 進もうとした方向を正規化
+		float dirX = dx / distance;
+		float dirZ = dz / distance;
+
+		// 回り込み用の角度
+		const float kPi = 3.14159265f;
+
+		const float angles[] = {
+			45.0f,
+			90.0f,
+			135.0f
+		};
+
+		bool moved = false;
+
+		// 左右の回り込みを試す
+		for (float angleDegree : angles) {
+
+			float angle = angleDegree * kPi / 180.0f;
+
+			for (int side = 0; side < 2; side++) {
+
+				// 敵ごとに優先方向を固定して、
+				// 左右の切り替わりを減らす
+				float sign = (i % 2 == 0) ? 1.0f : -1.0f;
+
+				if (side == 1) {
+					sign = -sign;
+				}
+
+				float a = angle * sign;
+
+				// 移動方向を回転
+				float moveX =
+					dirX * std::cos(a) -
+					dirZ * std::sin(a);
+
+				float moveZ =
+					dirX * std::sin(a) +
+					dirZ * std::cos(a);
+
+				Vector3 candidate = oldPosition;
+
+				candidate.x += moveX * distance;
+				candidate.z += moveZ * distance;
+
+				// フィールドから出ないようにする
+				candidate.x = std::clamp(
+					candidate.x, -95.0f, 95.0f
+				);
+
+				candidate.z = std::clamp(
+					candidate.z, -95.0f, 95.0f
+				);
+
+				// 回り込んだ先が空いていれば移動
+				if (!IsBlocked(i, candidate)) {
+
+					enemy.SetPosition(candidate);
+					moved = true;
+					break;
+				}
+			}
+
+			if (moved) {
+				break;
+			}
+		}
+
+		// 回り込めない場合はその場で停止
+		if (!moved) {
+			enemy.SetPosition(oldPosition);
+		}
+	}
 }
