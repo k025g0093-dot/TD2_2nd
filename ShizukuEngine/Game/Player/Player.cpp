@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-void Player::Initialize(int model, int animation,const Vector3& position) {
+void Player::Initialize(int model, int animation, const Vector3& position) {
 
 	mModel = model;
 	mAnimation = animation;
@@ -17,7 +17,7 @@ void Player::Initialize(int model, int animation,const Vector3& position) {
 	mDodgeCooldownTimer = 0.0f;
 }
 
-void Player::Update(const PlayerCommand& cmd,float yaw, float dt) {
+void Player::Update(const PlayerCommand& cmd, float yaw, float dt) {
 
 	// クールタイム更新
 	if (mDodgeCooldownTimer > 0.0f) {
@@ -86,14 +86,12 @@ void Player::Update(const PlayerCommand& cmd,float yaw, float dt) {
 }
 
 void Player::Draw(ShizukuEngine* engine) {
-	for (int i = 0; i < 30; i++) {
-		engine->DrawSkinnedModel(
-			mModel,
-			mAnimation,
-			mPosition+i,
-			{ 0.0f, mRotationY, 0.0f },
-			{ 1.0f, 1.0f, 1.0f },
-			{ 1.0f, 1.0f, 1.0f, 1.0f }
-		);
-	}
+	engine->DrawSkinnedModel(
+		mModel,
+		mAnimation,
+		mPosition,
+		{ 0.0f, mRotationY, 0.0f },
+		{ 1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f, 1.0f }
+	);
 }
