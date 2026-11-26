@@ -10,7 +10,8 @@ public:
     // 敵の種類
     enum class Type {
         kChase,   // 近距離型
-        kRanged   // 遠距離型
+        kRanged,  // 遠距離型
+        kElite    // エリート型
     };
 
     // 弾
@@ -23,7 +24,12 @@ public:
 
 public:
 
-    void Initialize(int model, int animation, const Vector3& position, Type type = Type::kChase);
+    void Initialize(
+        int model,
+        int animation,
+        const Vector3& position,
+        Type type = Type::kChase
+    );
 
     void Update(const Vector3& playerPosition, float dt);
 
@@ -33,7 +39,7 @@ public:
 
 private:
 
-    // 近距離型
+    // 近距離型・エリート型
     void UpdateChase(
         const Vector3& playerPosition,
         float dt
@@ -62,7 +68,7 @@ private:
 
     Type mType = Type::kChase;
 
-    // ザコ敵の移動速度
+    // 移動速度
     float mSpeed = 4.0f;
 
     // 遠距離型の設定
@@ -73,5 +79,4 @@ private:
 
     // 弾の管理
     std::vector<Bullet> mBullets;
-
 };
