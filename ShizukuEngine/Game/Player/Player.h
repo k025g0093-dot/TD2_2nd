@@ -14,6 +14,7 @@ public:
 	void Draw(ShizukuEngine* engine);
 
 	const Vector3& GetPosition() const { return mPosition; }
+	const Vector3& GetScale()const { return mScale; }
 	float GetRotationY() const { return mRotationY; }
 	int GetModel() const { return mModel; }
 	bool IsShotThisFrame() const { return mShotThisFrame; }
@@ -23,6 +24,7 @@ private:
 	int mModel = -1;
 	int mAnimation = -1;
 	Vector3 mPosition{};
+	Vector3 mScale{};
 	float mRotationY = 0.0f;
 
 	float mSpeed = 10.0f;

@@ -13,6 +13,7 @@ void Player::Initialize(int model, int animation, const Vector3& position) {
 	mPrevDodgeButton = false;
 
 	mDodgeDirection = Vector3{};
+	mScale = { 1,1,1 };
 	mDodgeTimer = 0.0f;
 	mDodgeCooldownTimer = 0.0f;
 }
@@ -91,7 +92,7 @@ void Player::Draw(ShizukuEngine* engine) {
 		mAnimation,
 		mPosition,
 		{ 0.0f, mRotationY, 0.0f },
-		{ 1.0f, 1.0f, 1.0f },
+		mScale,
 		{ 1.0f, 1.0f, 1.0f, 1.0f }
 	);
 }

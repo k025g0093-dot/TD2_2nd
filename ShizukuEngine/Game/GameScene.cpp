@@ -174,3 +174,84 @@ void GameScene::SpawnEnemy() {
 
 	mSpawnCount++;
 }
+
+
+void GameScene::AllCollision() {
+	EnemyToPlayer();
+	BossToPlayerCollision();
+	EnemyToEnemyCollision();
+}
+
+void GameScene::EnemyToPlayer() {
+
+	for (Enemy& enemy : mEnemies) {
+
+		OBB enemyObb{};
+		enemyObb.center = enemy.GetPosition();
+		enemyObb.orientations[0] = { 1,0,0 };
+		enemyObb.orientations[1] = { 0,1,1 };
+		enemyObb.orientations[2] = { 0,0,1 };
+		enemyObb.size = { 1.0f,1.0f,1.0f };
+
+		std::vector<OBB>playerObb{};
+		playerObb = mEngine->CreateAnimationModelOBBsCollision(
+			player, dancce,
+			mPlayer.GetPosition(), { 0,mPlayer.GetRotationY(),0 }, mPlayer.GetScale()
+		);
+
+		if (mEngine->IsAnimationOBBToOBB(playerObb, enemyObb)) {
+			/*TODO　ここに当たり判定の内容を記述*/
+		}
+	}
+}
+
+
+void GameScene::BossToPlayerCollision() {
+
+	std::vector<OBB>playerObb{};
+	playerObb = mEngine->CreateAnimationModelOBBsCollision(
+		player, dancce,
+		mPlayer.GetPosition(), { 0,mPlayer.GetRotationY(),0 }, mPlayer.GetScale()
+	);
+
+	OBB bossObb{};
+	bossObb.center = mBoss.GetPosition();
+	bossObb.orientations[0] = { 1,0,0 };
+	bossObb.orientations[1] = { 0,1,1 };
+	bossObb.orientations[2] = { 0,0,1 };
+	bossObb.size = mBoss.GetScale();
+
+	if (mEngine->IsAnimationOBBToOBB(playerObb, bossObb)) {
+		/*TODO　ここに当たり判定の内容を記述*/
+	}
+
+}
+
+
+void GameScene::EnemyToEnemyCollision() {
+
+	for (Enemy& enemy : mEnemies) {
+
+		OBB enemyObb1{};
+		enemyObb1.center = enemy.GetPosition();
+		enemyObb1.orientations[0] = { 1,0,0 };
+		enemyObb1.orientations[1] = { 0,1,1 };
+		enemyObb1.orientations[2] = { 0,0,1 };
+		enemyObb1.size = { 1.0f,1.0f,1.0f };
+
+		OBB enemyObb2{};
+		enemyObb2.center = enemy.GetPosition();
+		enemyObb2.orientations[0] = { 1,0,0 };
+		enemyObb2.orientations[1] = { 0,1,1 };
+		enemyObb2.orientations[2] = { 0,0,1 };
+		enemyObb2.size = { 1.0f,1.0f,1.0f };
+
+		if (mEngine->IsOBBToOBB(enemyObb1, enemyObb2)) {
+
+			/*TODO　敵同士が重ならないようにする処理で*/
+
+		}
+
+	}
+
+}
