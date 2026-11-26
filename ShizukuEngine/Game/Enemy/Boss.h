@@ -23,6 +23,8 @@ public:
 
     const Vector3& GetPosition() const { return mPosition; }
 
+    const Vector3& GetScale()const { return mScale; }
+
 private:
 
     // 状態ごとの更新
@@ -41,6 +43,7 @@ private:
 
     Vector3 mPosition{};
     Vector3 mChargeDirection{};
+    Vector3 mScale{};
 
     float mRotationY = 0.0f;
 

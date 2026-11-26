@@ -12,7 +12,7 @@ void Boss::Initialize(int model, int animation, const Vector3& position) {
 
     mRotationY = 0.0f;
     mChargeDirection = Vector3{ 0.0f, 0.0f, 1.0f };
-
+    mScale = { 2,2,2 };
     mState = State::kMove;
 
     mAttackTimer = 0.0f;
@@ -157,7 +157,7 @@ void Boss::Draw(ShizukuEngine* engine) {
         mAnimation,
         mPosition,
         { 0.0f, mRotationY, 0.0f },
-        { 2.0f, 2.0f, 2.0f },
+        mScale,
         { 1.0f, 1.0f, 1.0f, 1.0f }
     );
 }

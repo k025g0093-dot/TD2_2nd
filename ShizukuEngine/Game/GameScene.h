@@ -27,6 +27,14 @@ private:
 	// ザコ敵の出現
 	void SpawnEnemy();
 
+	void AllCollision();
+
+	void BossToPlayerCollision();
+
+	void EnemyToEnemyCollision();
+
+	void EnemyToPlayer();
+
 private:
 
 	ShizukuEngine* mEngine = nullptr;
