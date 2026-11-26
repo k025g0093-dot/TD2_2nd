@@ -27,6 +27,9 @@ private:
 	// ザコ敵の出現
 	void SpawnEnemy();
 
+	// エリート敵の召喚
+	void SpawnEliteEnemy();
+
 	void AllCollision();
 
 	void BossToPlayerCollision();
@@ -64,6 +67,9 @@ private:
 
 	int enemy = 0;
 	int enemyAnimation = 0;
+
+	int eliteModel = 0;
+	int eliteAnimation = 0;
 
 	int bossModel = 0;
 	int bossAnimation = 0;

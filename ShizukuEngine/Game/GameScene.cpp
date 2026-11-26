@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <Windows.h>
+#include <algorithm>
 
 void GameScene::Initialize(ShizukuEngine* engine) {
 	mEngine = engine;
@@ -24,17 +25,23 @@ void GameScene::Initialize(ShizukuEngine* engine) {
 	enemyAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", enemy);
 	enemyAnimation = mEngine->CreateAnimator(enemy);
 
-	mEnemies.clear();
-
-	mSpawnTimer = 0.0f;
-	mSpawnCount = 0;
+	// エリート敵
+	eliteModel = mEngine->LoadSkinnedModel("resources/Flair/Flair.dae");
+	eliteAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", eliteModel);
+	eliteAnimation = mEngine->CreateAnimator(eliteModel);
 
 	// ボス
 	bossModel = mEngine->LoadModel("resources/Flair/Flair.dae");
 	bossAnimation = mEngine->LoadAnimation("resources/Flair/Flair.dae", bossModel);
-	bossAnimation = mEngine->CreateAnimator( bossModel);
+	bossAnimation = mEngine->CreateAnimator(bossModel);
 
 	mBoss.Initialize(bossModel, bossAnimation, { 5.0f, 0.0f, 5.0f });
+
+	// ザコ敵の初期化
+	mEnemies.clear();
+
+	mSpawnTimer = 0.0f;
+	mSpawnCount = 0;
 }
 
 void GameScene::Update(float dt) {
@@ -111,6 +118,12 @@ void GameScene::Run(float dt) {
 
 	mBoss.Update(mPlayer.GetPosition(), dt);
 
+	// エリート召喚
+	if (mBoss.ConsumeSummonRequest()) {
+		SpawnEliteEnemy();
+	}
+
+	// ザコ敵・エリートの更新
 	for (Enemy& enemy : mEnemies) {
 		enemy.Update(mPlayer.GetPosition(), dt);
 	}
@@ -157,7 +170,7 @@ void GameScene::SpawnEnemy() {
 	// 敵の種類
 	Enemy::Type type = Enemy::Type::kChase;
 
-	// 2体に1体を遠距離型にする
+	// 5体に1体を遠距離型にする
 	if (mSpawnCount % 5 == 1) {
 		type = Enemy::Type::kRanged;
 	}
@@ -177,6 +190,62 @@ void GameScene::SpawnEnemy() {
 	mSpawnCount++;
 }
 
+void GameScene::SpawnEliteEnemy() {
+
+	// ボスの周囲に4体召喚する
+	const int summonCount = 4;
+
+	// ボスからの出現距離
+	const float spawnDistance = 6.0f;
+
+	for (int i = 0; i < summonCount; i++) {
+
+		Vector3 spawnPosition = mBoss.GetPosition();
+
+		// ボスの周囲4方向に出現
+		switch (i) {
+
+		case 0:
+			spawnPosition.x += spawnDistance;
+			break;
+
+		case 1:
+			spawnPosition.x -= spawnDistance;
+			break;
+
+		case 2:
+			spawnPosition.z += spawnDistance;
+			break;
+
+		case 3:
+			spawnPosition.z -= spawnDistance;
+			break;
+		}
+
+		// フィールド外に出ないようにする
+		spawnPosition.x = std::clamp(
+			spawnPosition.x, -95.0f, 95.0f
+		);
+
+		spawnPosition.z = std::clamp(
+			spawnPosition.z, -95.0f, 95.0f
+		);
+
+		spawnPosition.y = 0.0f;
+
+		// エリート敵生成
+		Enemy elite;
+
+		elite.Initialize(
+			eliteModel,
+			eliteAnimation,
+			spawnPosition,
+			Enemy::Type::kElite
+		);
+
+		mEnemies.push_back(elite);
+	}
+}
 
 void GameScene::AllCollision() {
 	EnemyToPlayer();

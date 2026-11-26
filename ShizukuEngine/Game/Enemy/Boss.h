@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../ShizukuEngine/ShizukuEngine.h"
+#include <random>
 
 class Boss
 {
@@ -8,22 +9,32 @@ public:
 
     enum class State {
         kMove,
+        // 突進
         kWait,
         kCharge,
+        // 薙ぎ払い
         kSweepWait,
         kSweep,
+        // 波動
         kSlamWait,
         kShockwave,
+        // ジャンプ攻撃
+        kJumpWait,
+        kJump,
+        // エリート召喚
+        kSummonWait,
+        // 硬直
         kRecovery
     };
 
 public:
 
     void Initialize(int model, int animation, const Vector3& position);
-
     void Update(const Vector3& playerPosition, float dt);
-
     void Draw(ShizukuEngine* engine);
+
+    // GameSceneに召喚要求を渡す
+    bool ConsumeSummonRequest();
 
     const Vector3& GetPosition() const { return mPosition; }
 
@@ -31,22 +42,29 @@ public:
 
 private:
 
-    // 状態ごとの更新
+    // 通常移動
     void Move(const Vector3& playerPosition, float dt);
 
-    // 突進攻撃
+    // 突進
     void Wait(float dt);
     void Charge(float dt);
 
-    // 薙ぎ払い攻撃
+    // 薙ぎ払い
     void SweepWait(float dt);
     void Sweep(float dt);
 
-    // 波動攻撃
+    // 波動
     void SlamWait(float dt);
     void Shockwave(float dt);
 
-    // 攻撃後の硬直
+    // ジャンプ
+    void JumpWait(float dt);
+    void Jump(float dt);
+
+    // エリート召喚
+    void SummonWait(float dt);
+
+    // 硬直
     void Recovery(float dt);
 
     // プレイヤーとの距離
@@ -55,11 +73,14 @@ private:
     // プレイヤーの方向を向く
     void LookAtPlayer(const Vector3& playerPosition);
 
-    // 薙ぎ払いの予告
+    // 薙ぎ払い予告
     void DrawSweepWarning(ShizukuEngine* engine);
 
-    // 波動の描画
+    // 波動描画
     void DrawShockwave(ShizukuEngine* engine);
+
+    // ジャンプ予告
+    void DrawJumpWarning(ShizukuEngine* engine);
 
 private:
 
@@ -78,15 +99,16 @@ private:
     float mMoveSpeed = 3.0f;
     float mKeepDistance = 12.0f;
 
-    // 攻撃
+    // 攻撃間隔
     float mAttackInterval = 3.0f;
     float mAttackTimer = 0.0f;
 
-    // 近距離と遠距離の切り替え
+    // 距離による攻撃切り替え
     float mAttackDistance = 10.0f;
 
-    // 遠距離攻撃の切り替え
-    bool mNextFarAttackCharge = true;
+    // 遠距離攻撃の順番
+    // 0:突進 1:波動 2:ジャンプ
+    int mFarAttackCount = 0;
 
     // 突進準備
     float mWaitTime = 0.8f;
@@ -118,6 +140,27 @@ private:
 
     float mShockwaveTime = 2.0f;
     float mShockwaveTimer = 0.0f;
+
+    // ジャンプ
+    Vector3 mJumpStartPosition{};
+    Vector3 mJumpTargetPosition{};
+
+    float mJumpWaitTime = 0.8f;
+    float mJumpWaitTimer = 0.0f;
+
+    float mJumpTime = 0.9f;
+    float mJumpTimer = 0.0f;
+
+    float mJumpHeight = 12.0f;
+    float mJumpWarningRadius = 5.0f;
+
+    // エリート召喚
+    std::mt19937 mRandom{ std::random_device{}() };
+
+    bool mSummonRequested = false;
+
+    float mSummonWaitTime = 1.0f;
+    float mSummonWaitTimer = 0.0f;
 
     // 硬直
     float mRecoveryTime = 1.0f;

@@ -1,9 +1,14 @@
 #include "Enemy.h"
 
 #include <cmath>
+#include <algorithm>
 
 // 初期化
-void Enemy::Initialize(int model, int animation, const Vector3& position, Type type) {
+void Enemy::Initialize(
+    int model,
+    int animation,
+    const Vector3& position,
+    Type type) {
 
     mModel = model;
     mAnimation = animation;
@@ -15,11 +20,18 @@ void Enemy::Initialize(int model, int animation, const Vector3& position, Type t
     mShotTimer = 0.0f;
     mBullets.clear();
 
+    // 敵の種類で移動速度を変更
     if (mType == Type::kChase) {
+
         mSpeed = 4.0f;
     }
     else if (mType == Type::kRanged) {
+
         mSpeed = 2.5f;
+    }
+    else if (mType == Type::kElite) {
+
+        mSpeed = 4.0f;
     }
 }
 
@@ -28,21 +40,29 @@ void Enemy::Update(const Vector3& playerPosition, float dt) {
 
     switch (mType) {
 
+        // 近距離型
     case Type::kChase:
 
         UpdateChase(playerPosition, dt);
         break;
 
+        // 遠距離型
     case Type::kRanged:
 
         UpdateRanged(playerPosition, dt);
+        break;
+
+        // エリート型
+    case Type::kElite:
+
+        UpdateChase(playerPosition, dt);
         break;
     }
 
     UpdateBullets(dt);
 }
 
-// 近距離型の更新
+// 近距離型・エリート型の移動
 void Enemy::UpdateChase(
     const Vector3& playerPosition,
     float dt) {
@@ -57,14 +77,16 @@ void Enemy::UpdateChase(
         float dirX = dx / distance;
         float dirZ = dz / distance;
 
+        // プレイヤーに近づく
         mPosition.x += dirX * mSpeed * dt;
         mPosition.z += dirZ * mSpeed * dt;
 
+        // プレイヤーの方向を向く
         mRotationY = std::atan2(dirX, dirZ);
     }
 }
 
-// 遠距離型の更新
+// 遠距離型の移動
 void Enemy::UpdateRanged(
     const Vector3& playerPosition,
     float dt) {
@@ -89,7 +111,7 @@ void Enemy::UpdateRanged(
             mPosition.z += dirZ * mSpeed * dt;
         }
 
-        // 近すぎる場合は後退する
+        // 近い場合は後退する
         else if (distance < mKeepDistance - 3.0f) {
 
             mPosition.x -= dirX * mSpeed * dt;
@@ -97,7 +119,7 @@ void Enemy::UpdateRanged(
         }
     }
 
-    // フィールドから出ないようにする
+    // フィールド外に出ないようにする
     mPosition.x = std::clamp(mPosition.x, -95.0f, 95.0f);
     mPosition.z = std::clamp(mPosition.z, -95.0f, 95.0f);
 
@@ -159,6 +181,7 @@ void Enemy::UpdateBullets(float dt) {
             mBullets.begin(),
             mBullets.end(),
             [](const Bullet& bullet) {
+
                 return bullet.lifeTime <= 0.0f;
             }
         ),
@@ -169,7 +192,7 @@ void Enemy::UpdateBullets(float dt) {
 // 描画
 void Enemy::Draw(ShizukuEngine* engine) {
 
-    // 敵本体
+    // 近距離型
     if (mType == Type::kChase) {
 
         engine->DrawSkinnedModel(
@@ -181,9 +204,9 @@ void Enemy::Draw(ShizukuEngine* engine) {
             { 1.0f, 1.0f, 1.0f, 1.0f }
         );
     }
+    // 遠距離型
     else if (mType == Type::kRanged) {
 
-        // 遠距離型は色と大きさを変更
         engine->DrawSkinnedModel(
             mModel,
             mAnimation,
@@ -193,8 +216,20 @@ void Enemy::Draw(ShizukuEngine* engine) {
             { 0.4f, 0.4f, 1.0f, 1.0f }
         );
     }
+    // エリート型
+    else if (mType == Type::kElite) {
 
-    // 弾の描画
+        engine->DrawSkinnedModel(
+            mModel,
+            mAnimation,
+            mPosition,
+            { 0.0f, mRotationY, 0.0f },
+            { 1.3f, 1.3f, 1.3f },
+            { 0.8f, 0.25f, 1.0f, 1.0f }
+        );
+    }
+
+    // 遠距離型の弾を描画
     for (const Bullet& bullet : mBullets) {
 
         engine->DrawSkinnedModel(
