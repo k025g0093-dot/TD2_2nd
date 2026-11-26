@@ -168,7 +168,7 @@ public:
 	void DrawSkinnedModel(
 		int modelIndex, int boneSlot,
 		const Vector3& pos, const Vector3& rot, const Vector3& scale,
-		const Vector4 color,
+		const Vector4 color = { 1.0f,1.0f,1.0f,1.0f },
 		int textureIndx = -1);
 
 	//--------------------------------------------------------------
