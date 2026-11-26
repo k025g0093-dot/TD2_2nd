@@ -54,6 +54,9 @@ private:
 	Boss mBoss;
 	std::vector<Enemy> mEnemies;
 
+	// 敵の移動前の位置
+	std::vector<Vector3> mEnemyOldPositions;
+
 	float mSpawnTimer = 0.0f;
 	float mSpawnInterval = 3.0f;
 	int mSpawnCount = 0;
