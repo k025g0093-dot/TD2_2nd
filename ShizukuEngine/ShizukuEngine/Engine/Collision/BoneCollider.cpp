@@ -2,7 +2,6 @@
 #include "../Model/3DAnimation/SkinnedModel.h"
 #include "../Model/3DAnimation/Animator.h"
 
-
 OBB CreateOBBForBone(
 	const SkinnedModel& skinnedModel
 ) {
@@ -43,6 +42,9 @@ OBB CreateOBBForBone(
 	obb.orientations[2] = { 0.0f,0.0f,1.0f };
 	return obb;
 }
+
+
+
 
 std::vector<OBB>CreateAnimationBoneOBBs(
 	const SkinnedModel& skinnedModel
@@ -128,7 +130,6 @@ std::vector<OBB>UpdateAnimationBoneOBBs(
 	const Matrix4x4 matrix) {
 
 	size_t boneCount = skinnedModel.GetBoneCount();
-	const auto& vertices = skinnedModel.GetVertices();
 	std::vector<OBB> obb(boneCount);
 	for (size_t i = 0; i < skinnedModel.GetBoneOBBs().size(); i++) {
 		Matrix4x4 localWorldMatrix{};
@@ -188,6 +189,69 @@ std::vector<OBB>UpdateAnimationBoneOBBs(
 	}
 	return obb;
 }
+
+
+OBB UpdateMoelOBB(const Matrix4x4 matrix, const OBB localOBB) {
+
+	OBB obb{};
+	Matrix4x4 localWorldMatrix{};
+
+	localWorldMatrix = matrix;
+
+	/*各軸のレングスを計算*/
+	float lengthX = std::sqrt(
+		localWorldMatrix.m[0][0] * localWorldMatrix.m[0][0] +
+		localWorldMatrix.m[0][1] * localWorldMatrix.m[0][1] +
+		localWorldMatrix.m[0][2] * localWorldMatrix.m[0][2]
+	);
+
+	float lengthY = std::sqrt(
+		localWorldMatrix.m[1][0] * localWorldMatrix.m[1][0] +
+		localWorldMatrix.m[1][1] * localWorldMatrix.m[1][1] +
+		localWorldMatrix.m[1][2] * localWorldMatrix.m[1][2]
+	);
+
+	float lengthZ = std::sqrt(
+		localWorldMatrix.m[2][0] * localWorldMatrix.m[2][0] +
+		localWorldMatrix.m[2][1] * localWorldMatrix.m[2][1] +
+		localWorldMatrix.m[2][2] * localWorldMatrix.m[2][2]
+	);
+
+	/*長さが0は向きが決まらないため飛ばす*/
+	if (lengthX <= 0.0f || lengthY <= 0.0f || lengthZ <= 0.0f) {
+		return obb ;
+	}
+
+	/*中心を位置として変換*/
+	obb.center = TransformMatrix(localOBB.center, localWorldMatrix);
+
+	/*各軸の伸びた分をかけてボーンに合わせる*/
+	obb.size.x = localOBB.size.x * lengthX;
+	obb.size.y = localOBB.size.y * lengthY;
+	obb.size.z = localOBB.size.z * lengthZ;
+
+	/*向き：行列の各行を、その長さで割って長さ1にする*/
+	obb.orientations[0] = {
+		localWorldMatrix.m[0][0] / lengthX,
+		localWorldMatrix.m[0][1] / lengthX,
+		localWorldMatrix.m[0][2] / lengthX
+	};
+	obb.orientations[1] = {
+		localWorldMatrix.m[1][0] / lengthY,
+		localWorldMatrix.m[1][1] / lengthY,
+		localWorldMatrix.m[1][2] / lengthY
+	};
+	obb.orientations[2] = {
+		localWorldMatrix.m[2][0] / lengthZ,
+		localWorldMatrix.m[2][1] / lengthZ,
+		localWorldMatrix.m[2][2] / lengthZ
+	};
+
+	return obb;
+
+}
+
+
 
 
 bool IsAnimationOBBsToOBBsCollision(const std::vector<OBB>& obb1, const std::vector<OBB>& obb2) {

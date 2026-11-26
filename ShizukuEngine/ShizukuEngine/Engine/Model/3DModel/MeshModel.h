@@ -1,5 +1,6 @@
 #pragma once
 #include "Model/Model.h"
+#include "Collision/BoneCollider.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -48,6 +49,11 @@ public://パブリック
     void SetEnableLighting(bool enableLighting);
     bool GetEnableLighting() const { return mEnableLighting; }
 
+    //読み込み時に作った、モデル全体を囲むOBB（モデルの空間）
+    const OBB& GetLocalOBB() const { return mLocalOBBModel; }
+
+
+
 private://プライベート関数
     
     static const aiScene* Load(const std::string& filepath, Assimp::Importer& importer);
@@ -63,6 +69,10 @@ private://プライベート関数
         ComPtr<ID3D12Device> device,
         std::vector<VertexData>& vertices,
         std::vector<uint32_t>& indices);
+
+    OBB CreateOBBForModel(
+        const std::vector<VertexData>vertices
+    );
 
 
 private://メンバ変数
@@ -85,6 +95,8 @@ private://メンバ変数
     //マテリアルの値（UpdateMaterialでバッファに反映する）
     Vector4 mColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     bool mEnableLighting = true;
+
+    OBB mLocalOBBModel;
 
     uint32_t Align256(uint32_t size)
     {

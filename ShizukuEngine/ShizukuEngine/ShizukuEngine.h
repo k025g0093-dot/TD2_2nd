@@ -85,7 +85,7 @@ public:
 	//--------------------------------------------------------------
 	//音楽ファイル読み込み関数（対応してるのはWAV、MP3）
 	//--------------------------------------------------------------
-	SoundData LoadSound(const char *filePath);
+	SoundData LoadSound(const char* filePath);
 
 	//--------------------------------------------------------------
 	//音楽再生関数（対応してるのはWAV、MP3）
@@ -101,7 +101,7 @@ public:
 	//アニメーションスキン付きmodel読み込み関数
 	//--------------------------------------------------------------
 	int LoadAnimation(const std::string& animationPath, int skinnedModel);
-	
+
 	//--------------------------------------------------------------
 	//アニメーションの作成関数
 	//--------------------------------------------------------------
@@ -111,6 +111,26 @@ public:
 	//アニメーション変更作成関数
 	//--------------------------------------------------------------
 	void ChangeAnimation(int animators, int animation, bool isRooped = true);
+
+	//--------------------------------------------------------------
+	//アニメーションのボーンを指定してそれを返す関数
+	// 引数はスキンモデルの番号とほしいボーンの名前です
+	//--------------------------------------------------------------
+	int GetBoneIndex(int skinnedModel, const std::string& boneName);
+
+	//--------------------------------------------------------------
+	//ソケット式のobjectを対象にしたとこに合うようにする行列を作成する関数
+	//引数（
+	// ボーンのインデックス、スロット、
+	// 武器や帽子などの各トランスフォーム、
+	// 対象になるキャラクターのトランスフォーム
+	// ）
+	//--------------------------------------------------------------
+	Matrix4x4 GetSocketMatrix(
+		int boneIndex, int boneSlot,
+		const Vector3& pos, const Vector3& rot, const Vector3& scale,
+		const Vector3& actorPos, const Vector3& actorRot, const Vector3& actorScale
+	);
 
 	//--------------------------------------------------------------
 	//パーティクルのフィールド作成関数
@@ -129,10 +149,9 @@ public:
 	//--------------------------------------------------------------
 	int CreateGPUEmitter(const Emitter& emitter, int modelIndex, Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, bool isFixedColor = false);
 
-	
-	
 
-	Camera& GetCamera() { return mCamera; }
+
+
 
 	//-----------------------------------描画関数-----------------------------------//
 
@@ -140,12 +159,12 @@ public:
 	//--------------------------------------------------------------
 	//三角形の描画関数（引数は、位置、回転、スケール、色、テクスチャです）
 	//--------------------------------------------------------------
-	void DrawTriangle(const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndx = -1);
+	void DrawTriangle(const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndex = -1);
 
 	//--------------------------------------------------------------
 	//球体の描画関数（引数は、位置、回転、スケール、色、テクスチャです）
 	//--------------------------------------------------------------
-	void DrawSphere(const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndx = -1);
+	void DrawSphere(const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndex = -1);
 
 	//--------------------------------------------------------------
 	//線分の描画関数（引数は、開始位置、最終地点　色）
@@ -155,26 +174,36 @@ public:
 	//--------------------------------------------------------------
 	//スプライトの描画関数（引数は、左上を起点に下位置、回転、スケール、色、テクスチャです）
 	//--------------------------------------------------------------
-	void DrawSprite(const Vector2& pos, const float& rot, const float& width, const float& height, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndx = -1);
+	void DrawSprite(const Vector2& pos, const float& rot, const float& width, const float& height, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndex = -1);
 
 	//--------------------------------------------------------------
-	//モデルの描画関数（引数は、モデル番号、位置、回転、スケール、色、テクスチャです）テクスチャは宣言をしなくても平気です
+	//モデルの描画関数（引数は、モデル番号、位置、回転、スケール、色、テクスチャです）テクスチャ、色は宣言をしなくても平気です
 	//--------------------------------------------------------------
-	void DrawModel(int modelIndex, const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndx = -1);
+	void DrawModel(int modelIndex, const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndex = -1);
 
 	//--------------------------------------------------------------
-	//モデルの描画関数（引数は、モデル番号、アニメーション値、位置、回転、スケール、色、テクスチャです）テクスチャは宣言をしなくても平気です
+	//ソケット式モデル描画関数（引数は、モデル番号、位置、回転、スケール、色、テクスチャです）テクスチャ、色は宣言をしなくても平気です
+	//--------------------------------------------------------------
+	void DrawSocketModel(
+		int modelIndex,
+		const Matrix4x4& worldMatrix,
+		const Vector4 color,
+		int textureIndx
+	);
+
+	//--------------------------------------------------------------
+	//モデルの描画関数（引数は、モデル番号、アニメーション値、位置、回転、スケール、色、テクスチャです）テクスチャ、色は宣言をしなくても平気です
 	//--------------------------------------------------------------
 	void DrawSkinnedModel(
 		int modelIndex, int boneSlot,
 		const Vector3& pos, const Vector3& rot, const Vector3& scale,
 		const Vector4 color = { 1.0f,1.0f,1.0f,1.0f },
-		int textureIndx = -1);
+		int textureIndex = -1);
 
 	//--------------------------------------------------------------
 	//モデルパーティクルの描画関数（引数は、モデル番号、位置、回転、スケール、色、テクスチャです）テクスチャは宣言をしなくても平気です
 	//--------------------------------------------------------------
-	void DrawModelParticle(int modelIndex, const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndx = -1);
+	void DrawModelParticle(int modelIndex, const Vector3& pos, const Vector3& rot, const Vector3& scale, const Vector4 color = { 1.0f,1.0f,1.0f,1.0f }, int textureIndex = -1);
 
 
 
@@ -186,6 +215,13 @@ public:
 	//位置・回転・スケールは DrawSkinnedModel と同じ値を渡す
 	//--------------------------------------------------------------
 	std::vector<OBB> CreateAnimationModelOBBsCollision(int modelIndex, int boneSlot, const Vector3& pos, const Vector3& rot, const Vector3& scale);
+
+
+	//--------------------------------------------------------------
+	//モデルのコリジョンの作成関数
+	//位置・回転・スケールは DrawModel と同じ値を渡す
+	//--------------------------------------------------------------
+	OBB CreatModelOBBCollision(const int modelIndex, const Matrix4x4 mat);
 
 	//--------------------------------------------------------------
 	//アニメーションモデルどうしのOBB判定関数
@@ -203,6 +239,8 @@ public:
 	bool IsOBBToOBB(const OBB& obb1, const OBB& obb2);
 
 	//-----------------------------------getter、セッター関数-----------------------------------//
+
+	Camera& GetCamera() { return mCamera; }
 
 
 	//-----------------------------------ランダム関数などの便利関数-----------------------------------//
@@ -232,9 +270,10 @@ private://各種変数などの初期化
 	Input mInput{};
 	Sound* mSound{};
 
-	std::vector<std::unique_ptr<Animation>> mAnimations;
 	Animation mAnimation{};
-	std::vector < std::unique_ptr< Animator>> mAnimator{};
+	Animator mAnimator{};
+	std::vector<std::unique_ptr<Animation>> mAnimations;
+	std::vector < std::unique_ptr< Animator>> mAnimators{};
 
 	ModelManager mModelManager{};
 
